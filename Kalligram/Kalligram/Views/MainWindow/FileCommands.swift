@@ -6,7 +6,7 @@ import SwiftData
 struct FileCommands: Commands {
     let appViewModel: AppViewModel
     let appState: AppState
-    @Environment(\.modelContext) private var modelContext
+    let modelContext: ModelContext
 
     var body: some Commands {
         CommandGroup(after: .newItem) {
