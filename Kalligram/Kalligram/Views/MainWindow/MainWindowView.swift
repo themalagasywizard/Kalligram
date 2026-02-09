@@ -97,10 +97,7 @@ struct MainWindowView: View {
             citationVM: citationVM,
             commentsVM: commentsVM,
             historyVM: historyVM,
-            document: appViewModel.selectedDocument,
-            onBranchCreated: { newDoc in
-                appViewModel.openDocument(newDoc, in: appState)
-            }
+            document: appViewModel.selectedDocument
         )
         .inspectorColumnWidth(
             min: Spacing.inspectorMinWidth,

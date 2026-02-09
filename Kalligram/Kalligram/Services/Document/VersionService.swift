@@ -54,9 +54,6 @@ final class VersionService {
         to document: Document,
         modelContext: ModelContext
     ) {
-        // First save current state as a snapshot
-        _ = createSnapshot(for: document, triggerType: "pre_restore", modelContext: modelContext)
-
         // Then restore
         document.contentRTFData = version.contentRTFData
         document.contentPlainText = version.contentPlainText

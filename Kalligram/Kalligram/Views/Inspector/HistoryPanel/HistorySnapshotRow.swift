@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct HistorySnapshotRow: View {
-    let version: Version
+    let snapshot: ProjectSnapshot
     let isSelected: Bool
+    let isHead: Bool
     let iconName: String
     let onSelect: () -> Void
     let onRestore: () -> Void
@@ -14,7 +15,7 @@ struct HistorySnapshotRow: View {
         Button(action: onSelect) {
             HStack(spacing: Spacing.sm) {
                 // Preview thumbnail
-                SnapshotThumbnail(path: version.previewImagePath)
+                SnapshotThumbnail(path: snapshot.previewImagePath)
 
                 // Content
                 VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -22,33 +23,32 @@ struct HistorySnapshotRow: View {
                         Image(systemName: iconName)
                             .font(.system(size: 10))
                             .foregroundStyle(ColorPalette.textTertiary)
-                        Text(version.label)
+                        Text(snapshot.label)
                             .font(Typography.bodySmall)
                             .fontWeight(isSelected ? .medium : .regular)
                             .foregroundStyle(ColorPalette.textPrimary)
                             .lineLimit(1)
+                        if isHead {
+                            Text("HEAD")
+                                .font(Typography.caption2)
+                                .foregroundStyle(ColorPalette.accentBlue)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 1)
+                                .background(ColorPalette.accentBlue.opacity(0.12))
+                                .clipShape(Capsule())
+                        }
                     }
 
                     HStack(spacing: Spacing.sm) {
-                        Text(version.createdAt.formatted(date: .abbreviated, time: .shortened))
+                        Text(snapshot.createdAt.formatted(date: .abbreviated, time: .shortened))
                             .font(Typography.caption2)
                             .foregroundStyle(ColorPalette.textTertiary)
-                        Text("\(version.wordCount) words")
+                        Text("\(snapshot.wordCount) words")
                             .font(Typography.caption2)
                             .foregroundStyle(ColorPalette.textTertiary)
-                        Text("\(max(1, version.pageCount)) pages")
+                        Text("\(max(1, snapshot.pageCount)) pages")
                             .font(Typography.caption2)
                             .foregroundStyle(ColorPalette.textTertiary)
-                    }
-
-                    if !version.branchName.isEmpty && version.branchName != "Main" {
-                        Text(version.branchName)
-                            .font(Typography.caption2)
-                            .foregroundStyle(ColorPalette.accentBlue)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(ColorPalette.accentBlue.opacity(0.12))
-                            .clipShape(Capsule())
                     }
                 }
 
@@ -107,7 +107,7 @@ private struct SnapshotThumbnail: View {
                 .fill(ColorPalette.surfaceTertiary)
                 .frame(width: 44, height: 62)
 
-            if let image = VersionPreviewService.previewImage(from: path) {
+            if let image = ProjectSnapshotPreviewService.previewImage(from: path) {
                 Image(nsImage: image)
                     .resizable()
                     .scaledToFill()

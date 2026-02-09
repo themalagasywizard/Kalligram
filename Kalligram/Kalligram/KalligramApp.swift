@@ -24,6 +24,9 @@ struct KalligramApp: App {
                 Citation.self,
                 Comment.self,
                 Version.self,
+                ProjectBranch.self,
+                ProjectSnapshot.self,
+                SnapshotDocument.self,
                 AIAction.self,
                 ResearchNote.self,
                 UserSettings.self
