@@ -18,21 +18,43 @@ struct InspectorContainerView: View {
     var onInsertText: ((String) -> Void)?
     var onJumpToRange: ((NSRange) -> Void)?
 
+    @State private var toolbarHeight: CGFloat = Spacing.editorToolbarHeight
+
     var body: some View {
         VStack(spacing: 0) {
-            // Tab bar — flush with the toolbar area above.
-            // ignoresSafeArea pushes this into the toolbar-level gap
-            // so the inspector panel opens with tabs at the very top.
-            inspectorTabBar
+            // Spacer reserves the tab bar area (actual tab bar is in overlay
+            // to isolate it from content layout — prevents NSViewRepresentable
+            // content like AIPanelView from destabilising the tab bar).
+            Color.clear
+                .frame(height: toolbarHeight)
 
             KDivider()
 
-            // Tab content
             tabContent
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .overlay(alignment: .top) {
+            inspectorTabBar
+        }
         .background(ColorPalette.surfaceSecondary)
         .ignoresSafeArea(.container, edges: .top)
+        .onAppear {
+            measureToolbarHeight()
+        }
+    }
+
+    /// Read the window toolbar safe-area inset so the tab bar height
+    /// matches exactly, aligning its bottom border with the main toolbar.
+    private func measureToolbarHeight() {
+        DispatchQueue.main.async {
+            if let window = NSApp.keyWindow ?? NSApp.windows.first,
+               let contentView = window.contentView {
+                let inset = contentView.safeAreaInsets.top
+                if inset > 0 {
+                    toolbarHeight = inset
+                }
+            }
+        }
     }
 
     // MARK: - Tab Bar
@@ -46,6 +68,8 @@ struct InspectorContainerView: View {
                     }
                 } label: {
                     VStack(spacing: Spacing.xs) {
+                        Spacer(minLength: 0)
+
                         Image(systemName: tab.iconName)
                             .font(.system(size: 14))
                             .foregroundStyle(
@@ -59,6 +83,7 @@ struct InspectorContainerView: View {
                             .fill(appState.inspectorTab == tab ? ColorPalette.accentBlue : .clear)
                             .frame(height: 2)
                     }
+                    .padding(.bottom, Spacing.xs)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(Rectangle())
                 }
@@ -67,7 +92,7 @@ struct InspectorContainerView: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: Spacing.editorToolbarHeight)
+        .frame(height: toolbarHeight)
         .background(ColorPalette.surfaceSecondary)
     }
 
